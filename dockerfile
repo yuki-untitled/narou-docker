@@ -53,7 +53,7 @@ COPY --from=builder /usr/lib/x86_64-linux-gnu/libjpeg* /usr/lib/x86_64-linux-gnu
 COPY init.sh /usr/local/bin/
 
 ENV JAVA_HOME=/opt/jre \
-    PATH="${JAVA_HOME}/bin:${PATH}"
+    PATH="/opt/jre/bin:${PATH}"
 
 # narou ユーザーの作成
 RUN groupadd -g ${GID} narou && \
