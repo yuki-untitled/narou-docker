@@ -17,7 +17,7 @@ TrueNAS Scale での運用を想定し、現在更新が止まっている narou
 ## 構成
 
 ```
-my-narou/
+narou-docker/
 ├── dockerfile          # イメージ定義
 ├── docker-compose.yml  # 起動設定
 ├── init.sh            # 初期化スクリプト
@@ -101,6 +101,19 @@ docker compose up
 サイト側のアクセス制限により発生する可能性があります。  
 Web UI の設定からダウンロード間隔を長くしてください。
 
+### kindlegen について
+
+**重要**: kindlegen は Amazon が配布を終了しています。
+
+現在は **Web Archive** から取得していますが、以下のリスクがあります：
+
+- Web Archive のポリシー変更によりアクセス不可になる可能性
+- 将来的にビルドが失敗する可能性
+
+**ビルドが失敗した場合の対応**:
+- EPUB 形式のみでの利用を検討してください
+- Kindle への転送は、Kindle の「Send to Kindle」機能で EPUB を直接送信できます（最近の Kindle は EPUB をサポート）
+
 ## ライセンス
 
 MIT License - 詳細は [LICENSE](LICENSE) を参照
@@ -120,5 +133,4 @@ MIT License - 詳細は [LICENSE](LICENSE) を参照
 - AozoraEpub3 の**最新版自動取得**
 - **kindlegen の統合**（Web Archive から取得）
 - **User-Agent 設定**の改善
-- **libjpeg ライブラリ**の同梱（挿絵対応）
 - ドキュメントとコードの整備
