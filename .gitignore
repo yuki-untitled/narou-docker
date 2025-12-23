@@ -1,10 +1,11 @@
 # narou.rb データ
 .narou/
 .narousetting/
+log/
+小説データ/
 *.epub
 *.mobi
 *.txt
-log/
 
 # Docker
 .env
