@@ -2,13 +2,17 @@
 
 「小説家になろう」の小説をダウンロード・変換するツール narou.rb の Docker イメージです。
 
+TrueNAS Scale での運用を想定し、現在更新が止まっている narou.rb に対して必要なパッチや設定を適用したカスタムビルド版です。
+
 ## 特徴
 
-- **Oracle OpenJDK 21 (LTS)** - 最新の LTS バージョン
-- **AozoraEpub3 最新版** - 自動取得
-- **narou 3.9.1** - PR446 パッチ適用済み
-- **kindlegen 対応** - Kindle (MOBI) 形式への変換可能
-- **User-Agent 設定済み** - Chrome 131 として動作
+- **Oracle OpenJDK 21 (LTS)** - 最新の安定版 JDK
+- **AozoraEpub3 最新版** - GitHub から最新リリースを自動取得
+- **narou 3.9.1 + PR446 パッチ** - [Issues #446](https://github.com/whiteleaf7/narou/issues/446) 対応
+- **kindlegen 統合** - Kindle (MOBI) 形式への変換対応
+- **User-Agent 設定** - Chrome 131、[Issues #430](https://github.com/whiteleaf7/narou/issues/430) 対応
+
+> **注意**: narou 3.9.1 で固定しています。公式で不具合修正された場合、このパッチは不要になる可能性があります。
 
 ## 構成
 
@@ -17,48 +21,47 @@ my-narou/
 ├── dockerfile          # イメージ定義
 ├── docker-compose.yml  # 起動設定
 ├── init.sh            # 初期化スクリプト
+├── LICENSE            # MIT License
+├── .gitignore         # Git除外設定
 └── README.md          # このファイル
 ```
 
 ## 使用方法
 
-### 1. ビルド
+### 基本的な使い方
 
 ```bash
+# ビルド
 docker compose build
-```
 
-### 2. 起動
-
-```bash
+# 起動（バックグラウンド）
 docker compose up -d
-```
 
-### 3. アクセス
-
-ブラウザで `http://localhost:9200` にアクセス
-
-### 4. 停止
-
-```bash
+# 停止
 docker compose down
 ```
+
+### アクセス
+
+ブラウザで http://localhost:9200 にアクセス
 
 ## 設定
 
 ### ポート
 
-- `9200`: Web UI
-- `9201`: WebSocket
+| ポート | 用途 |
+|--------|------|
+| 9200 | Web UI |
+| 9201 | WebSocket |
 
 ### ボリューム
 
-カレントディレクトリが `/home/narou/novel` にマウントされます。
-小説データ、設定ファイルはここに保存されます。
+カレントディレクトリが `/home/narou/novel` にマウントされます。  
+小説データ、設定ファイル（`.narou`, `.narousetting`）はここに保存されます。
 
-### UID/GID
+### UID/GID のカスタマイズ
 
-デフォルトは `1000:1000` です。変更する場合は docker-compose.yml を編集：
+デフォルトは `1000:1000` です。変更する場合は `docker-compose.yml` を編集：
 
 ```yaml
 args:
@@ -68,15 +71,24 @@ args:
 
 ## TrueNAS Scale での使用
 
-1. Docker Hub にイメージを push（オプション）
-2. Custom Apps で設定：
-   - Image: ビルドしたイメージ名
-   - Ports: 9200→33000, 9201→33001
-   - Storage: Host Path を指定
+### 1. Docker Hub へのプッシュ（推奨）
+
+```bash
+docker tag narou:3.9.1 your-username/narou:3.9.1
+docker push your-username/narou:3.9.1
+```
+
+### 2. Custom Apps での設定
+
+- **Image**: `your-username/narou:3.9.1`
+- **Port Forwarding**: 
+  - Host: 9200 → Container: 33000
+  - Host: 9201 → Container: 33001
+- **Storage**: Host Path を指定（小説データの保存先）
 
 ## トラブルシューティング
 
-### 権限エラーが出る
+### 権限エラー
 
 ```bash
 docker compose down
@@ -86,7 +98,8 @@ docker compose up
 
 ### 403 Forbidden エラー
 
-アクセス間隔を長くしてください（Web UI から設定可能）
+サイト側のアクセス制限により発生する可能性があります。  
+Web UI の設定からダウンロード間隔を長くしてください。
 
 ## ライセンス
 
@@ -96,15 +109,16 @@ MIT License - 詳細は [LICENSE](LICENSE) を参照
 
 このプロジェクトは以下を参考・使用して作成されました：
 
-- **[whiteleaf7/narou](https://github.com/whiteleaf7/narou)** - narou.rb 本体 (MIT License)
-- **[kokotaro/narou-docker](https://github.com/kokotaro/narou)** - ベースとなった Docker 実装と PR446 パッチ
+- **[whiteleaf7/narou](https://github.com/whiteleaf7/narou)** (MIT License) - narou.rb 本体
+- **[kokotaro/narou-docker](https://github.com/kokotaro/narou)** - Docker 実装のベースと PR446 パッチ
 - **[kyukyunyorituryo/AozoraEpub3](https://github.com/kyukyunyorituryo/AozoraEpub3)** - EPUB 変換ツール
-- [元記事](https://qiita.com/kokotaro@github/items/5c8da7281407b7484507)
+- **[参考記事](https://qiita.com/kokotaro@github/items/5c8da7281407b7484507)** - Docker 化の参考
 
-### 変更点（オリジナル）
+### 主な変更点
 
-- Oracle OpenJDK 21 (LTS) への変更
-- AozoraEpub3 最新版の自動取得
-- kindlegen の統合
-- User-Agent 設定の改善
-- 各種最適化とドキュメント整備
+- Adoptium Temurin → **Oracle OpenJDK 21 (LTS)** への変更
+- AozoraEpub3 の**最新版自動取得**
+- **kindlegen の統合**（Web Archive から取得）
+- **User-Agent 設定**の改善
+- **libjpeg ライブラリ**の同梱（挿絵対応）
+- ドキュメントとコードの整備
