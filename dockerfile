@@ -11,7 +11,8 @@ RUN apt update && apt install -y jq unzip wget ca-certificates && \
     curl -L -o jdk-21.tar.gz https://download.oracle.com/java/21/latest/jdk-21_linux-x64_bin.tar.gz && \
     mkdir jdk-21 && tar zxf jdk-21.tar.gz -C ./jdk-21 --strip-components 1 && \
     mv jdk-21 /usr/local/jdk-21 && \
-    export JAVA_HOME=/usr/local/jdk-21 PATH=$PATH:$JAVA_HOME/bin && \
+    export JAVA_HOME=/usr/local/jdk-21 && \
+    export PATH=/usr/local/jdk-21/bin:$PATH && \
     jlink --no-header-files --no-man-pages --compress=2 \
           --add-modules java.base,java.datatransfer,java.desktop \
           --output /opt/jre && \
@@ -30,9 +31,10 @@ RUN apt update && apt install -y jq unzip wget ca-certificates && \
     cp -f ncode.syosetu.com.yaml novel18.syosetu.com.yaml ${NAROU_DIR}/ && \
     # kindlegen のダウンロード
     curl -L https://web.archive.org/web/20150803131026if_/https://kindlegen.s3.amazonaws.com/kindlegen_linux_2.6_i386_v2_9.tar.gz -o kg.tar.gz && \
-    tar -xzf kg.tar.gz kindlegen && \
+    tar -xzf kg.tar.gz && \
     chmod +x kindlegen && \
-    mv kindlegen /opt/aozoraepub3/
+    mv kindlegen /opt/aozoraepub3/ && \
+    rm -rf kg.tar.gz docs
 
 # ========================================
 # 最終イメージ
