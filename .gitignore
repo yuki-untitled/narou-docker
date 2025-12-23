@@ -1,0 +1,14 @@
+# narou.rb データ
+.narou/
+.narousetting/
+*.epub
+*.mobi
+*.txt
+log/
+
+# Docker
+.env
+
+# OS
+.DS_Store
+Thumbs.db
