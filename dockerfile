@@ -44,12 +44,16 @@ COPY --from=builder /opt/jre /opt/jre
 COPY --from=builder /lib/x86_64-linux-gnu/libjpeg* /lib/x86_64-linux-gnu/
 COPY --from=builder /usr/lib/x86_64-linux-gnu/libjpeg* /usr/lib/x86_64-linux-gnu/
 COPY init.sh /usr/local/bin/
+COPY fix-websocket-port.patch /tmp/
 
 ENV JAVA_HOME=/opt/jre \
     PATH="/opt/jre/bin:${PATH}"
 
-# 必要なパッケージのインストールとnarou ユーザーの作成
-RUN apt update && apt install -y wget && rm -rf /var/lib/apt/lists/* && \
+# 必要なパッケージのインストール、パッチ適用、narou ユーザーの作成
+RUN apt update && apt install -y wget patch && rm -rf /var/lib/apt/lists/* && \
+    cd /usr/local/bundle/gems/narou-* && \
+    patch -p1 < /tmp/fix-websocket-port.patch && \
+    rm /tmp/fix-websocket-port.patch && \
     groupadd -g ${GID} narou && \
     adduser narou --shell /bin/bash --uid ${UID} --gid ${GID} && \
     chmod +x /usr/local/bin/init.sh

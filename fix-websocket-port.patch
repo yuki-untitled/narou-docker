@@ -1,0 +1,18 @@
+--- a/lib/web/public/resources/js/narou.library.js
++++ b/lib/web/public/resources/js/narou.library.js
+@@ -288,11 +288,10 @@
+       }
+     },
+ 
+-    create_ws_uri: function() {
+-      // HTTPS→wss, HTTP→ws を自動選択し、
+-      // ポートは location.host（デフォルト 443 は省略済み）を使う
+-      var scheme = location.protocol === "https:" ? "wss:" : "ws:";
+-      return scheme + "//" + location.host + "/";
++    create_ws_uri: function () {
++      var host = location.hostname,
++        port = location.port;
++      return "ws://" + host + ":" + (parseInt(port) + 1) + "/";
+     },
+ 
+     onmessage: function (data) {
