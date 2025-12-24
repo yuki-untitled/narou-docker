@@ -14,6 +14,7 @@ aozoraepub3dir: "/opt/aozoraepub3"
 over18: true
 server-port: 33000
 server-bind: 0.0.0.0
+websocket-port: 33001
 EOF
 
   # サーバー設定

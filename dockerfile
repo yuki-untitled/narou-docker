@@ -15,9 +15,8 @@ RUN apt update && apt install -y jq unzip wget ca-certificates git && \
           --add-modules java.base,java.datatransfer,java.desktop \
           --output /opt/jre && \
     # narou.rb のインストール (Rumia版 - User-Agent問題解決版)
-    gem install tilt -v 2.4.0 && \
     gem install specific_install && \
-    gem specific_install https://github.com/Rumia-Channel/narou.git && \
+    gem specific_install -b docker https://github.com/Rumia-Channel/narou.git && \
     # AozoraEpub3 最新版の取得
     LATEST_URL=$(curl -s https://api.github.com/repos/kyukyunyorituryo/AozoraEpub3/releases/latest | \
                  jq -r '.assets[] | select(.name | endswith(".zip")) | .browser_download_url') && \
@@ -49,8 +48,9 @@ COPY init.sh /usr/local/bin/
 ENV JAVA_HOME=/opt/jre \
     PATH="/opt/jre/bin:${PATH}"
 
-# narou ユーザーの作成
-RUN groupadd -g ${GID} narou && \
+# 必要なパッケージのインストールとnarou ユーザーの作成
+RUN apt update && apt install -y wget && rm -rf /var/lib/apt/lists/* && \
+    groupadd -g ${GID} narou && \
     adduser narou --shell /bin/bash --uid ${UID} --gid ${GID} && \
     chmod +x /usr/local/bin/init.sh
 
