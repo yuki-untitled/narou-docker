@@ -8,7 +8,7 @@ TrueNAS Scale での運用を想定し、現在更新が止まっている narou
 
 本イメージは、依存関係・小説ページ構造の変更・Linux User-Agent問題・ハーメルン403エラーなどを修正された [Rumia-Channel/narou (dockerブランチ)](https://github.com/Rumia-Channel/narou/tree/docker) をベースに、WebSocket機能の修正パッチを適用して構築しています。
 
-> **謝辞**: プロジェクトを作成された whiteleaf7 氏、narou.rb の改良・拡張を継続されている Rumia-Channel 氏に感謝いたします。
+> **謝辞**: narou.rb を開発された [whiteleaf7](https://github.com/whiteleaf7) 氏、narou.rb の改良・拡張を継続されている [Rumia-Channel](https://github.com/Rumia-Channel) 氏、改造版 AozoraEpub3 を開発された [kyukyunyorituryo](https://github.com/kyukyunyorituryo) 氏に深く感謝いたします。
 
 ## 特徴
 
@@ -17,7 +17,7 @@ TrueNAS Scale での運用を想定し、現在更新が止まっている narou
 - **Oracle OpenJDK Java 21（LTS）** - 最新の安定版 JDK
   - Oracle 公式の Java を利用し、安定性を重視
   - LTS バージョンのため、長期的なサポートが受けられる
-- **AozoraEpub3 最新版** - GitHub から最新リリースを自動取得
+- **[改造版 AozoraEpub3](https://github.com/kyukyunyorituryo/AozoraEpub3) 最新版** - GitHub から最新リリースを自動取得
 - **Rumia's narou fork (docker branch)** - Linux User-Agent問題とハーメルン403エラーを解決
   - Web サーバーの代替として tilt が不要になり、依存関係を削減
   - 小説の取得方法を wget ベースに変更し、Linux/Docker 環境に最適化
@@ -26,7 +26,7 @@ TrueNAS Scale での運用を想定し、現在更新が止まっている narou
   - 本イメージではポート分離環境での動作を実現するため、WebSocket接続部分に[カスタムパッチ](fix-websocket-port.patch)を適用
 - **kindlegen 統合** - Kindle (MOBI) 形式への変換対応
 
-> **注意**: [Rumia-Channel/narou (dockerブランチ)](https://github.com/Rumia-Channel/narou/tree/docker) を使用しています。
+> **注意**: narou.rb 本体は [Rumia-Channel/narou (dockerブランチ)](https://github.com/Rumia-Channel/narou/tree/docker) を使用しています。
 
 ## 構成
 
