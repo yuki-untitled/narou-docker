@@ -1,3 +1,14 @@
+This project is based in part on the work of Rumia-Channel/narou (Rumia fork/docker branch) and its patches. The original Rumia fork is licensed under the MIT License, and this repository follows the same terms. See the Rumia fork repository for details.
+
+This project is primarily licensed under the MIT License.
+
+Some files and components included in this repository are licensed under different terms:
+- Parts of the code (e.g., shortcut.js, web_socket.rb) are licensed under the BSD License.
+- Some assets (e.g., CSS Toggle Switch) are released into the public domain (Unlicense).
+- Please refer to each file's header or the README for details.
+
+---
+
 MIT License
 
 Copyright (c) 2020 whiteleaf (narou.rb)
@@ -6,6 +17,7 @@ Copyright (c) 2025 iruka (Docker implementation and customizations)
 Based on:
 - narou.rb by whiteleaf7 (https://github.com/whiteleaf7/narou)
 - narou-docker by kokotaro (https://github.com/kokotaro/narou)
+- narou-docker (Rumia fork/docker branch) by Rumia-Channel (https://github.com/Rumia-Channel/narou)
 - AozoraEpub3 by kyukyunyorituryo (https://github.com/kyukyunyorituryo/AozoraEpub3)
 
 Permission is hereby granted, free of charge, to any person obtaining
