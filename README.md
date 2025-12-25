@@ -21,10 +21,13 @@ TrueNAS Scale での運用を想定し、現在更新が止まっている narou
 - **Rumia's narou fork (docker branch)** - Linux User-Agent問題とハーメルン403エラーを解決
   - Web サーバーの代替として tilt が不要になり、依存関係を削減
   - 小説の取得方法を wget ベースに変更し、Linux/Docker 環境に最適化
+- **kindlegen 統合** - Kindle (MOBI) 形式への変換対応
 - **WebSocket修正パッチ適用** - リアルタイムログ表示機能を完全動作
   - Rumia-Channel 氏の dockerブランチは nginx 経由での運用を想定（443ポート一本化）
-  - 本イメージではポート分離環境での動作を実現するため、WebSocket接続部分に[カスタムパッチ](fix-websocket-port.patch)を適用
-- **kindlegen 統合** - Kindle (MOBI) 形式への変換対応
+  - 本イメージではポート分離環境での動作を実現するため、WebSocket接続部分に[WebSocket 修正パッチ](fix-websocket-port.patch)を適用
+- **iBooks変換修正パッチ適用** - Apple iBooks 形式への変換も安定動作
+  - iBooks形式を含む、EPUB/i文庫/Kindle/Kobo/SonyReader等すべての端末形式への変換が成功
+  - [iBooks 修正パッチ](fix-ibooks-args.patch)を適用し、iBooks形式の変換エラー（引数不一致）を解消
 
 > **注意**: narou.rb 本体は [Rumia-Channel/narou (dockerブランチ)](https://github.com/Rumia-Channel/narou/tree/docker) を使用しています。
 

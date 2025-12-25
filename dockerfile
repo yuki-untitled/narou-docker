@@ -45,6 +45,7 @@ COPY --from=builder /lib/x86_64-linux-gnu/libjpeg* /lib/x86_64-linux-gnu/
 COPY --from=builder /usr/lib/x86_64-linux-gnu/libjpeg* /usr/lib/x86_64-linux-gnu/
 COPY init.sh /usr/local/bin/
 COPY fix-websocket-port.patch /tmp/
+COPY fix-ibooks-args.patch /tmp/
 
 ENV JAVA_HOME=/opt/jre \
     PATH="/opt/jre/bin:${PATH}"
@@ -53,7 +54,9 @@ ENV JAVA_HOME=/opt/jre \
 RUN apt update && apt install -y wget patch && rm -rf /var/lib/apt/lists/* && \
     cd /usr/local/bundle/gems/narou-* && \
     patch -p1 < /tmp/fix-websocket-port.patch && \
+    patch -p1 < /tmp/fix-ibooks-args.patch && \
     rm /tmp/fix-websocket-port.patch && \
+    rm /tmp/fix-ibooks-args.patch && \
     groupadd -g ${GID} narou && \
     adduser narou --shell /bin/bash --uid ${UID} --gid ${GID} && \
     chmod +x /usr/local/bin/init.sh

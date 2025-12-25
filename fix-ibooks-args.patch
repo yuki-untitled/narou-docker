@@ -1,0 +1,13 @@
+--- a/lib/device/ibooks.rb
++++ b/lib/device/ibooks.rb
+@@ -36,8 +36,8 @@
+   #
+   # EPUBへ変換したあとiBooksが管理しているディレクトリに展開する
+   #
+-  def hook_convert_txt_to_ebook_file(&original_func)
+-    ebook_file_path = original_func.call
++  def hook_convert_txt_to_ebook_file(*args, &original_func)
++    ebook_file_path = original_func.call(*args)
+     return ebook_file_path unless ebook_file_path
+     return ebook_file_path unless @@__ibooks_container_dir
+     epubdir_path = nil
