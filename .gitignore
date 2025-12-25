@@ -9,9 +9,6 @@ tmp/
 *.mobi
 *.txt
 
-# バックアップファイル
-narou.library.js.*
-
 # Docker
 .env
 

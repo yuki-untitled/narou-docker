@@ -2,28 +2,43 @@
 
 「小説家になろう」の小説をダウンロード・変換するツール narou.rb の Docker イメージです。
 
+## 概要
+
 TrueNAS Scale での運用を想定し、現在更新が止まっている narou.rb に対して必要なパッチや設定を適用したカスタムビルド版です。
+
+本イメージは、依存関係・小説ページ構造の変更・Linux User-Agent問題・ハーメルン403エラーなどを修正された [Rumia-Channel/narou (dockerブランチ)](https://github.com/Rumia-Channel/narou/tree/docker) をベースに、WebSocket機能の修正パッチを適用して構築しています。
+
+> **謝辞**: プロジェクトを作成された whiteleaf7 氏、narou.rb の改良・拡張を継続されている Rumia-Channel 氏に感謝いたします。
 
 ## 特徴
 
-- **Oracle OpenJDK 21 (LTS)** - 最新の安定版 JDK
+- **Ruby 3.4** - Rumia版が要求する最新の安定版
+  - 3.4系の最新パッチバージョンを自動取得
+- **Oracle OpenJDK Java 21（LTS）** - 最新の安定版 JDK
+  - Oracle 公式の Java を利用し、安定性を重視
+  - LTS バージョンのため、長期的なサポートが受けられる
 - **AozoraEpub3 最新版** - GitHub から最新リリースを自動取得
-- **narou 3.9.1 + PR446 パッチ** - [Issues #446](https://github.com/whiteleaf7/narou/issues/446) 対応
+- **Rumia's narou fork (docker branch)** - Linux User-Agent問題とハーメルン403エラーを解決
+  - Web サーバーの代替として tilt が不要になり、依存関係を削減
+  - 小説の取得方法を wget ベースに変更し、Linux/Docker 環境に最適化
+- **WebSocket修正パッチ適用** - リアルタイムログ表示機能を完全動作
+  - Rumia-Channel 氏の dockerブランチは nginx 経由での運用を想定（443ポート一本化）
+  - 本イメージではポート分離環境での動作を実現するため、WebSocket接続部分に[カスタムパッチ](fix-websocket-port.patch)を適用
 - **kindlegen 統合** - Kindle (MOBI) 形式への変換対応
-- **User-Agent 設定** - Chrome 131、[Issues #430](https://github.com/whiteleaf7/narou/issues/430) 対応
 
-> **注意**: narou 3.9.1 で固定しています。公式で不具合修正された場合、このパッチは不要になる可能性があります。
+> **注意**: [Rumia-Channel/narou (dockerブランチ)](https://github.com/Rumia-Channel/narou/tree/docker) を使用しています。
 
 ## 構成
 
 ```
 narou-docker/
-├── dockerfile          # イメージ定義
-├── docker-compose.yml  # 起動設定
-├── init.sh            # 初期化スクリプト
-├── LICENSE            # MIT License
-├── .gitignore         # Git除外設定
-└── README.md          # このファイル
+├── dockerfile                # イメージ定義
+├── docker-compose.yml        # 起動設定
+├── init.sh                   # 初期化スクリプト
+├── fix-websocket-port.patch  # WebSocket修正パッチ
+├── LICENSE                   # MIT License
+├── .gitignore                # Git除外設定
+└── README.md                 # このファイル
 ```
 
 ## 使用方法
@@ -74,13 +89,13 @@ args:
 ### 1. Docker Hub へのプッシュ（推奨）
 
 ```bash
-docker tag narou:3.9.1 your-username/narou:3.9.1
-docker push your-username/narou:3.9.1
+docker tag narou:iruka your-username/narou:iruka
+docker push your-username/narou:iruka
 ```
 
 ### 2. Custom Apps での設定
 
-- **Image**: `your-username/narou:3.9.1`
+- **Image**: `your-username/narou:iruka`
 - **Port Forwarding**: 
   - Host: 9200 → Container: 33000
   - Host: 9201 → Container: 33001
@@ -123,14 +138,20 @@ MIT License - 詳細は [LICENSE](LICENSE) を参照
 このプロジェクトは以下を参考・使用して作成されました：
 
 - **[whiteleaf7/narou](https://github.com/whiteleaf7/narou)** (MIT License) - narou.rb 本体
-- **[kokotaro/narou-docker](https://github.com/kokotaro/narou)** - Docker 実装のベースと PR446 パッチ
+- **[Rumia-Channel/narou (dockerブランチ)](https://github.com/Rumia-Channel/narou/tree/docker)** - Linux/Docker 環境に最適化された改良版
+  - Linux User-Agent 問題とハーメルン403エラーの解決
+  - 依存関係の削減と wget ベースの実装
+- **[kokotaro/narou-docker](https://github.com/kokotaro/narou)** - Docker 実装のベース
 - **[kyukyunyorituryo/AozoraEpub3](https://github.com/kyukyunyorituryo/AozoraEpub3)** - EPUB 変換ツール
 - **[参考記事](https://qiita.com/kokotaro@github/items/5c8da7281407b7484507)** - Docker 化の参考
 
 ### 主な変更点
 
-- Adoptium Temurin → **Oracle OpenJDK 21 (LTS)** への変更
+- Ruby 3.4.1 固定 → **Ruby 3.4 自動更新**（Rumia版の要件に対応）
+- Adoptium Temurin 21 → **Oracle OpenJDK Java 21（LTS）** への変更
 - AozoraEpub3 の**最新版自動取得**
 - **kindlegen の統合**（Web Archive から取得）
-- **User-Agent 設定**の改善
+- **Rumia's narou fork (docker branch)** 採用で Linux 環境の問題を解決
+- **[WebSocket 修正パッチ](fix-websocket-port.patch)**でリアルタイムログ表示を復活
+- ハーメルンなど各種サイトからのダウンロード動作を改善
 - ドキュメントとコードの整備

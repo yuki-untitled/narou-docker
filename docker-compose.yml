@@ -4,10 +4,10 @@ services:
       context: .
       dockerfile: dockerfile
       args:
-        NAROU_VERSION: 3.9.1
+        NAROU_VERSION: iruka
         UID: 1000
         GID: 1000
-    image: narou:3.9.1
+    image: narou:iruka
     command: ["narou", "web", "-np", "33000"]
     volumes:
       - type: bind
