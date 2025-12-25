@@ -2,17 +2,39 @@
 
 「小説家になろう」の小説をダウンロード・変換するツール narou.rb の Docker イメージです。
 
-TrueNAS Scale での運用を想定し、現在更新が止まっている narou.rb に対して必要なパッチや設定を適用したカスタムビルド版です。
+## 概要
+
+本イメージは、[kokotaro/narou-docker](https://github.com/kokotaro/narou-docker) をベースに、各種パッチや機能追加・修正を加えた改良版です。
+
+> **重要: LinuxやDocker環境でnarou.rbを安定して利用したい場合は、[yuki-untitled/narou-docker](https://github.com/yuki-untitled/narou-docker/tree/master) のご利用をおすすめします。**
+> 
+> 本リポジトリ（originalブランチ）は「どうしてもオリジナル版をご利用になりたい方」向けです。User-Agent問題などの制約があるため、通常は上記の推奨版をご検討ください。
+
+> **謝辞**: narou.rb を開発された [whiteleaf7](https://github.com/whiteleaf7) 氏、Dockerイメージを公開された [kokotaro](https://github.com/kokotaro) 氏、改造版 AozoraEpub3 を開発された [kyukyunyorituryo](https://github.com/kyukyunyorituryo) 氏に深く感謝いたします。
 
 ## 特徴
 
-- **Oracle OpenJDK 21 (LTS)** - 最新の安定版 JDK
-- **AozoraEpub3 最新版** - GitHub から最新リリースを自動取得
+- **Ruby 3.4** - Rumia版が要求する最新の安定版
+  - 3.4系の最新パッチバージョンを自動取得
+- **Oracle OpenJDK Java 21（LTS）** - 最新の安定版 JDK
+  - Oracle 公式の Java を利用し、安定性を重視
+  - LTS バージョンのため、長期的なサポートが受けられる
+- **[改造版 AozoraEpub3](https://github.com/kyukyunyorituryo/AozoraEpub3) 最新版** - GitHub から最新リリースを自動取得
 - **narou 3.9.1 + PR446 パッチ** - [Issues #446](https://github.com/whiteleaf7/narou/issues/446) 対応
-- **kindlegen 統合** - Kindle (MOBI) 形式への変換対応
+  - narou 3.9.1 で固定しています。
+  - 公式で不具合修正された場合、このパッチは不要になる可能性があります。
 - **User-Agent 設定** - Chrome 131、[Issues #430](https://github.com/whiteleaf7/narou/issues/430) 対応
+  - Windows や MacOS では正常にUser-Agentが反映されます。
+  - **Linux（特にDocker環境）ではUser-Agentの上書きが仕様上反映されず、反映できません。**
+  - そのため、一部小説サイトでは正常にダウンロードできず、**403 Forbiddenエラー**が生じる場合があります。
+  - これはnarou.rb本体やDockerの仕様によるもので、現状Linux環境では回避が困難です。
+- **kindlegen 統合** - Kindle (MOBI) 形式への変換対応
 
-> **注意**: narou 3.9.1 で固定しています。公式で不具合修正された場合、このパッチは不要になる可能性があります。
+> **注意**: 
+> - narou 3.9.1 で固定しています。公式で不具合修正された場合、このパッチは不要になる可能性があります。
+> - **User-Agent設定はLinux（Docker）では反映できず、403 Forbiddenエラーが発生する場合があります。**
+>   WindowsやMacOSでは正常動作しますが、Linux環境では仕様上困難です。
+> - **LinuxやDocker環境で動かしたい・このエラーを解消したい場合は、[yuki-untitled/narou-docker](https://github.com/yuki-untitled/narou-docker/tree/master) の利用もご検討ください。**
 
 ## 構成
 
@@ -129,8 +151,10 @@ MIT License - 詳細は [LICENSE](LICENSE) を参照
 
 ### 主な変更点
 
-- Adoptium Temurin → **Oracle OpenJDK 21 (LTS)** への変更
-- AozoraEpub3 の**最新版自動取得**
+- Ruby 3.4.1 固定 → **Ruby 3.4 自動更新**（Rumia版の要件に対応）
+- Adoptium Temurin 21 → **Oracle OpenJDK Java 21（LTS）** への変更
+- 改造版 AozoraEpub3 の**最新版自動取得**
 - **kindlegen の統合**（Web Archive から取得）
 - **User-Agent 設定**の改善
+- **PR446パッチを適用**
 - ドキュメントとコードの整備

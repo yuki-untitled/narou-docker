@@ -1,7 +1,7 @@
 # ========================================
 # narou.rb Docker Image (Custom Build)
 # ========================================
-FROM ruby:3.4.1-bookworm AS builder
+FROM ruby:3.4-bookworm AS builder
 
 ARG NAROU_VERSION=3.9.1
 
@@ -39,7 +39,7 @@ RUN apt update && apt install -y jq unzip wget ca-certificates && \
 # ========================================
 # 最終イメージ
 # ========================================
-FROM ruby:3.4.1-slim-bookworm
+FROM ruby:3.4-slim-bookworm
 
 ARG UID=1000
 ARG GID=1000
