@@ -8,13 +8,14 @@ if [ ! -e /home/narou/novel/.narou ]; then
   mkdir .narou .narousetting
   
   # グローバル設定
+  # 仕様: docs/spec/official-narou-policy.md
+  # 公式narou.rbには websocket-port キーは無く、WebSocketは server-port + 1 が自動的に使われる
   cat > .narousetting/global_setting.yaml <<EOF
 ---
 aozoraepub3dir: "/opt/aozoraepub3"
 over18: true
 server-port: 33000
 server-bind: 0.0.0.0
-websocket-port: 33001
 EOF
 
   # サーバー設定

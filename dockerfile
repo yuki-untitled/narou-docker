@@ -1,10 +1,11 @@
 # ========================================
-# narou.rb Docker Image (Custom Build)
+# narou.rb Docker Image (Custom Build - 公式版)
 # ========================================
+# 仕様: docs/spec/official-narou-policy.md
 FROM ruby:3.4-bookworm AS builder
 
 # JDK、narou、AozoraEpub3、kindlegen のセットアップ
-RUN apt update && apt install -y jq unzip wget ca-certificates git && \
+RUN apt update && apt install -y jq unzip wget ca-certificates && \
     # Oracle OpenJDK 21 (LTS) のダウンロードとjlink実行
     curl -L -o jdk-21.tar.gz https://download.oracle.com/java/21/latest/jdk-21_linux-x64_bin.tar.gz && \
     mkdir jdk-21 && tar zxf jdk-21.tar.gz -C ./jdk-21 --strip-components 1 && \
@@ -14,9 +15,12 @@ RUN apt update && apt install -y jq unzip wget ca-certificates git && \
     jlink --no-header-files --no-man-pages --compress=2 \
           --add-modules java.base,java.datatransfer,java.desktop \
           --output /opt/jre && \
-    # narou.rb のインストール (Rumia版 - User-Agent問題解決版)
-    gem install specific_install && \
-    gem specific_install -b docker https://github.com/Rumia-Channel/narou.git && \
+    # narou.rb のインストール (公式版 - rubygems.org から最新版を取得)
+    # narou.gemspecの `tilt ~> 2.0` 指定に上限が無く、tilt 2.5.0以降は
+    # `tilt/erubis` アダプタが削除されておりWebサーバーが起動できないため、
+    # アダプタを含む最後のバージョン(2.4.0)を先に固定インストールする
+    gem install tilt -v 2.4.0 && \
+    gem install narou --conservative && \
     # AozoraEpub3 最新版の取得
     LATEST_URL=$(curl -s https://api.github.com/repos/kyukyunyorituryo/AozoraEpub3/releases/latest | \
                  jq -r '.assets[] | select(.name | endswith(".zip")) | .browser_download_url') && \
@@ -44,20 +48,12 @@ COPY --from=builder /opt/jre /opt/jre
 COPY --from=builder /lib/x86_64-linux-gnu/libjpeg* /lib/x86_64-linux-gnu/
 COPY --from=builder /usr/lib/x86_64-linux-gnu/libjpeg* /usr/lib/x86_64-linux-gnu/
 COPY init.sh /usr/local/bin/
-COPY fix-websocket-port.patch /tmp/
-COPY fix-ibooks-args.patch /tmp/
 
 ENV JAVA_HOME=/opt/jre \
     PATH="/opt/jre/bin:${PATH}"
 
-# 必要なパッケージのインストール、パッチ適用、narou ユーザーの作成
-RUN apt update && apt install -y wget patch && rm -rf /var/lib/apt/lists/* && \
-    cd /usr/local/bundle/gems/narou-* && \
-    patch -p1 < /tmp/fix-websocket-port.patch && \
-    patch -p1 < /tmp/fix-ibooks-args.patch && \
-    rm /tmp/fix-websocket-port.patch && \
-    rm /tmp/fix-ibooks-args.patch && \
-    groupadd -g ${GID} narou && \
+# narou ユーザーの作成
+RUN groupadd -g ${GID} narou && \
     adduser narou --shell /bin/bash --uid ${UID} --gid ${GID} && \
     chmod +x /usr/local/bin/init.sh
 
