@@ -57,6 +57,16 @@ docker compose down
 
 ブラウザで http://localhost:9200 にアクセス
 
+### 定期実行（cron など）
+
+起動中のコンテナで `narou update` を定期実行する場合は、`-T` を付けたうえで標準入力を `/dev/null` にしてください。
+
+```bash
+docker compose exec -T narou narou update </dev/null
+```
+
+narou.rb は標準入力が端末でないとき、パイプで作品 ID の一覧が渡されたとみなして入力を待ちます。`-T` だけで標準入力を閉じないと、何も表示されないまま止まることがあります。
+
 ## 設定
 
 ### ポート
