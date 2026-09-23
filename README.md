@@ -28,6 +28,9 @@ TrueNAS Scale での運用を想定し、現在更新が止まっている narou
 - **iBooks変換修正パッチ適用** - Apple iBooks 形式への変換も安定動作
   - iBooks形式を含む、EPUB/i文庫/Kindle/Kobo/SonyReader等すべての端末形式への変換が成功
   - [iBooks 修正パッチ](fix-ibooks-args.patch)を適用し、iBooks形式の変換エラー（引数不一致）を解消
+- **wget エラー時の異常終了修正パッチ適用** - 取得失敗時も `narou update` が最後まで動作
+  - 名前解決の失敗などで wget が失敗すると、エラー内容の文字コード不一致により `narou update` 全体が異常終了し、残りの作品が更新されない問題があった
+  - [wget エンコーディング修正パッチ](fix-wget-encoding.patch)を適用し、失敗した作品はエラー内容をログに出して、次の作品の更新に進むようにした
 
 > **注意**: narou.rb 本体は [Rumia-Channel/narou (dockerブランチ)](https://github.com/Rumia-Channel/narou/tree/docker) を使用しています。
 
@@ -39,6 +42,8 @@ narou-docker/
 ├── docker-compose.yml        # 起動設定
 ├── init.sh                   # 初期化スクリプト
 ├── fix-websocket-port.patch  # WebSocket修正パッチ
+├── fix-ibooks-args.patch     # iBooks変換修正パッチ
+├── fix-wget-encoding.patch   # wget エラー時の異常終了修正パッチ
 ├── LICENSE                   # MIT License
 ├── .gitignore                # Git除外設定
 └── README.md                 # このファイル
@@ -62,6 +67,16 @@ docker compose down
 ### アクセス
 
 ブラウザで http://localhost:9200 にアクセス
+
+### 定期実行（cron など）
+
+起動中のコンテナで `narou update` を定期実行する場合は、`-T` を付けたうえで標準入力を `/dev/null` にしてください。
+
+```bash
+docker compose exec -T narou narou update </dev/null
+```
+
+narou.rb は標準入力が端末でないとき、パイプで作品 ID の一覧が渡されたとみなして入力を待ちます。`-T` だけで標準入力を閉じないと、何も表示されないまま止まることがあります。
 
 ## 設定
 

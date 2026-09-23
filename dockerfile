@@ -54,6 +54,7 @@ COPY --from=builder /usr/lib/x86_64-linux-gnu/libjpeg* /usr/lib/x86_64-linux-gnu
 COPY init.sh /usr/local/bin/
 COPY fix-websocket-port.patch /tmp/
 COPY fix-ibooks-args.patch /tmp/
+COPY fix-wget-encoding.patch /tmp/
 
 ENV JAVA_HOME=/opt/jre \
     PATH="/opt/jre/bin:${PATH}"
@@ -65,7 +66,8 @@ RUN apt update && apt install -y wget patch && rm -rf /var/lib/apt/lists/*
 RUN cd /usr/local/bundle/gems/narou-* && \
     patch -p1 < /tmp/fix-websocket-port.patch && \
     patch -p1 < /tmp/fix-ibooks-args.patch && \
-    rm /tmp/fix-websocket-port.patch /tmp/fix-ibooks-args.patch
+    patch -p1 < /tmp/fix-wget-encoding.patch && \
+    rm /tmp/fix-websocket-port.patch /tmp/fix-ibooks-args.patch /tmp/fix-wget-encoding.patch
 
 # narou ユーザーの作成
 RUN groupadd -g ${GID} narou && \

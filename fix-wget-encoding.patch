@@ -1,0 +1,13 @@
+--- a/lib/wget.rb
++++ b/lib/wget.rb
+@@ -49,6 +49,10 @@
+       command = %'wget --server-response --compression=auto -O - #{cmd_headers.join(" ")} "#{uri}"'
+ 
+       status, stdout, stderr = systemu(command)
++      # systemu の出力は ASCII-8BIT。wget は非 ASCII（‘’ など）を出力するため、
++      # 例外メッセージが narou 本体で UTF-8 文字列と連結された際の
++      # Encoding::CompatibilityError を防ぐ。stdout（本文）は文字コード判定に影響するため触らない
++      stderr = stderr.dup.force_encoding(Encoding::UTF_8).scrub
+ 
+       unless status.success?
+         http_status_line = stderr.lines.grep(/  HTTP\/\d\.\d /).last
