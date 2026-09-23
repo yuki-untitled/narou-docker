@@ -11,7 +11,7 @@
 
 require "stringio"
 require "open-uri" # For OpenURI::HTTPError
-require "systemu"
+require "open3"
 require_relative "inventory"
 
 module Narou
@@ -40,26 +40,35 @@ module Narou
       ua = Inventory.load("local_setting")["user-agent"] || "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:140.0) Gecko/20100101 Firefox/140.0"
 
       # Build wget command
+      # 仕様: docs/spec/official-narou-policy.md#What（何を）
+      # シェルを介さず引数を配列で渡し、値中の記号がシェルに解釈されないようにする
       cmd_headers = []
       # Default headers from user's prompt
-      cmd_headers << %'--header="User-Agent: #{ua}"'
-      cmd_headers << %'--header="Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"'
-      cmd_headers << %'--header="Accept-Language: ja,en-US;q=0.9,en;q=0.8"'
-      cmd_headers << %'--header="Accept-Encoding: gzip, deflate"'
-      cmd_headers << %'--header="Accept-Charset: utf-8"'
-      cmd_headers << %'--header="Connection: keep-alive"'
+      cmd_headers << "User-Agent: #{ua}"
+      cmd_headers << "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+      cmd_headers << "Accept-Language: ja,en-US;q=0.9,en;q=0.8"
+      cmd_headers << "Accept-Encoding: gzip, deflate"
+      cmd_headers << "Accept-Charset: utf-8"
+      cmd_headers << "Connection: keep-alive"
 
       # Headers from options hash
       options.each do |key, value|
         next unless key.is_a?(String)
-        cmd_headers << %'--header="#{key}: #{value}"'
+        cmd_headers << "#{key}: #{value}"
       end
 
-      command = %'wget --server-response --compression=auto -O - #{cmd_headers.join(" ")} "#{uri}"'
+      command = ["wget", "--server-response", "--compression=auto", "-O", "-"]
+      command.concat(cmd_headers.map { |header| "--header=#{header}" })
+      command << uri.to_s
 
-      status, stdout, stderr = systemu(command)
+      begin
+        # binmode: 本文の文字コード判定は呼び出し側に任せるため、出力は ASCII-8BIT のまま受け取る
+        stdout, stderr, status = Open3.capture3(*command, binmode: true)
+      rescue SystemCallError => e
+        raise OpenURI::HTTPError.new("wget command could not be executed: #{e.message}", nil)
+      end
       # 仕様: docs/spec/official-narou-policy.md#What（何を）
-      # systemu の出力は ASCII-8BIT。wget は非 ASCII（‘’ など）を出力するため、
+      # wget の出力は ASCII-8BIT で受け取る。wget は非 ASCII（‘’ など）を出力するため、
       # 例外メッセージが narou 本体で UTF-8 文字列と連結された際の
       # Encoding::CompatibilityError を防ぐ。stdout（本文）は文字コード判定に影響するため触らない
       stderr = stderr.dup.force_encoding(Encoding::UTF_8).scrub
