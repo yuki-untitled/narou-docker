@@ -4,8 +4,14 @@
 # 仕様: docs/spec/official-narou-policy.md
 FROM ruby:3.4-bookworm AS builder
 
+WORKDIR /tmp/build
+
+# narou.rb本体に上書きするファイル群（詳細は各ファイル冒頭のコメント・仕様を参照）
+# 仕様: docs/spec/official-narou-policy.md
+COPY overlay/ overlay/
+
 # JDK、narou、AozoraEpub3、kindlegen のセットアップ
-RUN apt update && apt install -y jq unzip wget ca-certificates && \
+RUN apt update && apt install -y jq unzip wget ca-certificates patch && \
     # Oracle OpenJDK 21 (LTS) のダウンロードとjlink実行
     curl -L -o jdk-21.tar.gz https://download.oracle.com/java/21/latest/jdk-21_linux-x64_bin.tar.gz && \
     mkdir jdk-21 && tar zxf jdk-21.tar.gz -C ./jdk-21 --strip-components 1 && \
@@ -21,6 +27,13 @@ RUN apt update && apt install -y jq unzip wget ca-certificates && \
     # アダプタを含む最後のバージョン(2.4.0)を先に固定インストールする
     gem install tilt -v 2.4.0 && \
     gem install narou --conservative && \
+    NAROU_GEM_DIR=$(gem environment gemdir)/gems/narou-* && \
+    # サイト構造変更への追従 (PR446, 本家未マージのためビルド時に最新差分を取得して適用)
+    # https://github.com/whiteleaf7/narou/pull/446
+    curl -sL https://patch-diff.githubusercontent.com/raw/whiteleaf7/narou/pull/446.diff | \
+      patch -d $NAROU_GEM_DIR -p1 && \
+    # Linux/Docker環境の403 Forbidden対策 (wgetベース取得方式への置き換え)
+    cp overlay/wget.rb overlay/extension.rb $NAROU_GEM_DIR/lib/ && \
     # AozoraEpub3 最新版の取得
     LATEST_URL=$(curl -s https://api.github.com/repos/kyukyunyorituryo/AozoraEpub3/releases/latest | \
                  jq -r '.assets[] | select(.name | endswith(".zip")) | .browser_download_url') && \
@@ -52,8 +65,10 @@ COPY init.sh /usr/local/bin/
 ENV JAVA_HOME=/opt/jre \
     PATH="/opt/jre/bin:${PATH}"
 
+# wget: lib/wget.rb（403 Forbidden対策の取得方式）が実行時に利用する
 # narou ユーザーの作成
-RUN groupadd -g ${GID} narou && \
+RUN apt update && apt install -y wget && rm -rf /var/lib/apt/lists/* && \
+    groupadd -g ${GID} narou && \
     adduser narou --shell /bin/bash --uid ${UID} --gid ${GID} && \
     chmod +x /usr/local/bin/init.sh
 

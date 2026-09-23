@@ -19,9 +19,11 @@ TrueNAS Scale での運用を想定し、公式 narou.rb（[whiteleaf7/narou](ht
 - **[改造版 AozoraEpub3](https://github.com/kyukyunyorituryo/AozoraEpub3) 最新版** - GitHub から最新リリースを自動取得
 - **公式 narou.rb** - rubygems.org から `gem install narou` で最新リリースを取得
   - WebSocket のポートは `server-port + 1` が自動的に使われる仕様のため、追加のパッチは不要（詳細は [docs/spec/official-narou-policy.md](docs/spec/official-narou-policy.md)）
+- **サイト構造変更への自動追従** - 本家未マージの [PR #446](https://github.com/whiteleaf7/narou/pull/446)（小説家になろう・ハーメルン等のページ構造修正）をビルド時に最新差分で取得・適用
+- **Linux/Docker 環境の403 Forbidden対策** - Rumia 版の `wget` ベース取得方式（MIT License）を移植し、User-Agent反映・ハーメルン403問題を解消
 - **kindlegen 統合** - Kindle (MOBI) 形式への変換対応
 
-> **注意**: narou.rb 本体は [whiteleaf7/narou](https://github.com/whiteleaf7/narou)（公式・rubygems.org 配信版）を使用しています。開発が止まっているため、依存関係やサイト構造の変化への追従は遅れる可能性があります。Linux 環境での既知の問題（User-Agent問題、ハーメルン403エラーなど）への対応が必要な場合は [`rumia-narou` ブランチ](https://github.com/yuki-untitled/narou-docker/tree/rumia-narou) を検討してください。
+> **注意**: narou.rb 本体は [whiteleaf7/narou](https://github.com/whiteleaf7/narou)（公式・rubygems.org 配信版）を使用しています。gem リリース自体は更新が止まっていますが、サイト構造変更への追従とLinux環境の403対策は本ブランチで別途対応しています（詳細は [docs/spec/official-narou-policy.md](docs/spec/official-narou-policy.md)）。
 
 ## 構成
 
@@ -30,6 +32,7 @@ narou-docker/
 ├── dockerfile                        # イメージ定義
 ├── docker-compose.yml                # 起動設定
 ├── init.sh                           # 初期化スクリプト
+├── overlay/                          # narou.rb本体に上書きするファイル（403対策など）
 ├── docs/spec/official-narou-policy.md # 本ブランチの方針（仕様）
 ├── LICENSE                           # MIT License
 └── README.md                         # このファイル
@@ -107,8 +110,7 @@ docker compose up
 
 ### 403 Forbidden エラー
 
-サイト側のアクセス制限により発生する可能性があります。
-Web UI の設定からダウンロード間隔を長くしてください。公式版では Rumia 版のようなハーメルン403対策は入っていないため、頻発する場合は [`rumia-narou` ブランチ](https://github.com/yuki-untitled/narou-docker/tree/rumia-narou) の利用も検討してください。
+本ブランチでは Rumia 版と同様の `wget` ベース取得方式を導入済みのため、Linux/Docker 環境特有の403エラーは解消されているはずです。それでも発生する場合はサイト側のアクセス制限の可能性があるため、Web UI の設定からダウンロード間隔を長くしてください。
 
 ### kindlegen について
 
@@ -132,6 +134,8 @@ MIT License - 詳細は [LICENSE](LICENSE) を参照
 このプロジェクトは以下を参考・使用して作成されました：
 
 - **[whiteleaf7/narou](https://github.com/whiteleaf7/narou)** (MIT License) - narou.rb 本体
+- **[Rumia-Channel/narou (docker ブランチ)](https://github.com/Rumia-Channel/narou/tree/docker)** (MIT License) - `wget` ベース取得方式（403対策, `overlay/wget.rb` / `overlay/extension.rb`）の移植元
+- **[etg-lt/narou (PR #446)](https://github.com/whiteleaf7/narou/pull/446)** - サイト構造変更への追従パッチ
 - **[kokotaro/narou-docker](https://github.com/kokotaro/narou)** - Docker 実装のベース
 - **[kyukyunyorituryo/AozoraEpub3](https://github.com/kyukyunyorituryo/AozoraEpub3)** - EPUB 変換ツール
 - **[参考記事](https://qiita.com/kokotaro@github/items/5c8da7281407b7484507)** - Docker 化の参考
