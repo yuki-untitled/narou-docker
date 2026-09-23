@@ -92,13 +92,13 @@ args:
 ### 1. Docker Hub へのプッシュ（推奨）
 
 ```bash
-docker tag narou:iruka your-username/narou:iruka
-docker push your-username/narou:iruka
+docker tag narou:rumia your-username/narou:rumia
+docker push your-username/narou:rumia
 ```
 
 ### 2. Custom Apps での設定
 
-- **Image**: `your-username/narou:iruka`
+- **Image**: `your-username/narou:rumia`
 - **Port Forwarding**: 
   - Host: 9200 → Container: 33000
   - Host: 9201 → Container: 33001
