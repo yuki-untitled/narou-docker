@@ -2,7 +2,7 @@
 
 「小説家になろう」の小説をダウンロード・変換するツール narou.rb の Docker イメージです。
 
-このブランチでは、公式 [whiteleaf7/narou](https://github.com/whiteleaf7/narou) をベースにビルドしています。Rumia-Channel 版フォークをベースにしたイメージは [`rumia-narou` ブランチ](https://github.com/yuki-untitled/narou-docker/tree/rumia-narou) を参照してください。
+このブランチでは、公式 [whiteleaf7/narou](https://github.com/whiteleaf7/narou) をベースにビルドしています。かつて提供していた Rumia-Channel 版フォークベースのイメージ（`rumia-narou` ブランチ）は、Rumia-Channel/narou が 2026-04-21 以降の更新を停止したため廃止しました。過去の内容は [`archive/rumia-narou` タグ](https://github.com/yuki-untitled/narou-docker/tree/archive/rumia-narou) に残しています。
 
 > 本ブランチの技術的な方針（narou.rb の入手元、パッチの適用要否など）は [docs/spec/official-narou-policy.md](docs/spec/official-narou-policy.md) を参照してください。
 
