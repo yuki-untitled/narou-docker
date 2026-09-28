@@ -46,12 +46,16 @@ RUN LATEST_URL=$(curl -s https://api.github.com/repos/kyukyunyorituryo/AozoraEpu
 # 仕様: docs/spec/official-narou-policy.md
 COPY overlay/ overlay/
 
-# サイト構造変更への追従 (PR446, 本家未マージのためビルド時に最新差分を取得して適用) と
+# サイト構造変更への追従 (PR456, 本家未マージのためビルド時に最新差分を取得して適用) と
 # Linux/Docker環境の403 Forbidden対策 (wgetベース取得方式への置き換え)
-# https://github.com/whiteleaf7/narou/pull/446
+# https://github.com/whiteleaf7/narou/pull/456
+# 取得失敗（HTTPエラー・空応答・エラーページ）を検知するため、パイプせず一旦ファイルに保存して検証する
+# 仕様: docs/spec/official-narou-policy.md
 RUN NAROU_GEM_DIR=$(gem environment gemdir)/gems/narou-* && \
-    curl -sL https://patch-diff.githubusercontent.com/raw/whiteleaf7/narou/pull/446.diff | \
-      patch -d $NAROU_GEM_DIR -p1 && \
+    curl -fsSL --retry 5 --retry-delay 3 --retry-all-errors \
+      https://patch-diff.githubusercontent.com/raw/whiteleaf7/narou/pull/456.diff -o pr456.diff && \
+    grep -q '^diff --git' pr456.diff && \
+    patch -d $NAROU_GEM_DIR -p1 < pr456.diff && \
     cp overlay/wget.rb overlay/extension.rb $NAROU_GEM_DIR/lib/
 
 # ========================================

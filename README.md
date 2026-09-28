@@ -19,7 +19,7 @@ TrueNAS Scale での運用を想定し、公式 narou.rb（[whiteleaf7/narou](ht
 - **[改造版 AozoraEpub3](https://github.com/kyukyunyorituryo/AozoraEpub3) 最新版** - GitHub から最新リリースを自動取得
 - **公式 narou.rb** - rubygems.org から `gem install narou` で最新リリースを取得
   - WebSocket のポートは `server-port + 1` が自動的に使われる仕様のため、追加のパッチは不要（詳細は [docs/spec/official-narou-policy.md](docs/spec/official-narou-policy.md)）
-- **サイト構造変更への自動追従** - 本家未マージの [PR #446](https://github.com/whiteleaf7/narou/pull/446)（小説家になろう・ハーメルン等のページ構造修正）をビルド時に最新差分で取得・適用
+- **サイト構造変更への自動追従** - 本家未マージの [PR #456](https://github.com/whiteleaf7/narou/pull/456)（小説家になろう・ハーメルン・カクヨム・暁等のページ構造修正）をビルド時に最新差分で取得・適用
 - **Linux/Docker 環境の403 Forbidden対策** - Rumia 版の `wget` ベース取得方式（MIT License）を移植し、User-Agent反映・ハーメルン403問題を解消
 - **kindlegen 統合** - Kindle (MOBI) 形式への変換対応
 
@@ -145,7 +145,7 @@ MIT License - 詳細は [LICENSE](LICENSE) を参照
 
 - **[whiteleaf7/narou](https://github.com/whiteleaf7/narou)** (MIT License) - narou.rb 本体
 - **[Rumia-Channel/narou (docker ブランチ)](https://github.com/Rumia-Channel/narou/tree/docker)** (MIT License) - `wget` ベース取得方式（403対策, `overlay/wget.rb` / `overlay/extension.rb`）の移植元
-- **[etg-lt/narou (PR #446)](https://github.com/whiteleaf7/narou/pull/446)** - サイト構造変更への追従パッチ
+- **[etg-lt/narou (PR #456)](https://github.com/whiteleaf7/narou/pull/456)** - サイト構造変更への追従パッチ
 - **[kokotaro/narou-docker](https://github.com/kokotaro/narou)** - Docker 実装のベース
 - **[kyukyunyorituryo/AozoraEpub3](https://github.com/kyukyunyorituryo/AozoraEpub3)** - EPUB 変換ツール
 - **[参考記事](https://qiita.com/kokotaro@github/items/5c8da7281407b7484507)** - Docker 化の参考
