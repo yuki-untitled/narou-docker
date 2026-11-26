@@ -43,6 +43,8 @@
 - `overlay/websocket_https.rb` が公式 gem 3.9.1 の `lib/web/public/resources/narou.library.js` を書き換えられること、結果が以前の差分ファイル（`patches/websocket-https.patch`）を当てたものと一致すること、書き換え箇所が無いときに異常終了することを確認済み（PR #456 は同ファイルを変更しない）。イメージをビルドし、手元の Caddy（`tls internal`、README と同じ `/ws` の中継）越しに `wss://<ホスト>/ws` で WebSocket のハンドシェイクが成立する（`101 Switching Protocols`）ことまで確認済み。**実運用の環境でのブラウザによる確認は未実施**
 - **wget ベース取得方式への置き換えを実機で確認済み**。`Narou::Wget.open` で実サイト（ncode.syosetu.com）への到達・本文取得に成功した。なお、置き換えに伴い `wget` バイナリが実行時に必要になるため、最終イメージにも `wget` パッケージを追加した
 
+- JDK は Oracle JDK 25（LTS）を使う。JDK 21 は Oracle の無償更新が終わり、`latest` の URL が 404 になってビルドできなくなったため。JDK 25 で `jlink`（従来と同じモジュール）と AozoraEpub3 による EPUB 変換が動くことを確認済み（narou の作品を変換する確認は未実施）
+
 ## 対象外（Out of Scope）
 
 - Rumia 版固有の依存関係削減（tilt 不要化など）を公式版に移植することは、今回のスコープ外

@@ -15,7 +15,7 @@ TrueNAS Scale での運用を想定し、公式 narou.rb（[whiteleaf7/narou](ht
 ## 特徴
 
 - **Ruby 3.4** - 3.4系の最新パッチバージョンを自動取得
-- **Oracle OpenJDK Java 21（LTS）** - 最新の安定版 JDK を利用
+- **Oracle JDK 25（LTS）** - 現行の LTS 版 JDK を利用
 - **[改造版 AozoraEpub3](https://github.com/kyukyunyorituryo/AozoraEpub3) 最新版** - GitHub から最新リリースを自動取得
 - **公式 narou.rb** - rubygems.org から `gem install narou` で最新リリースを取得
   - WebSocket のポートは `server-port + 1` が自動的に使われる仕様のため、http で使う分には追加のパッチは不要（詳細は [docs/spec/official-narou-policy.md](docs/spec/official-narou-policy.md)）

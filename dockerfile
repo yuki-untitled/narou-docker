@@ -17,15 +17,17 @@ RUN curl -L https://web.archive.org/web/20150803131026if_/https://kindlegen.s3.a
     mv kindlegen /opt/aozoraepub3/ && \
     rm -rf kg.tar.gz docs
 
-# Oracle OpenJDK 21 (LTS) のダウンロードとjlink実行
-RUN curl -L -o jdk-21.tar.gz https://download.oracle.com/java/21/latest/jdk-21_linux-x64_bin.tar.gz && \
-    mkdir jdk-21 && tar zxf jdk-21.tar.gz -C ./jdk-21 --strip-components 1 && \
-    mv jdk-21 /usr/local/jdk-21 && \
-    JAVA_HOME=/usr/local/jdk-21 PATH=/usr/local/jdk-21/bin:$PATH \
-      jlink --no-header-files --no-man-pages --compress=2 \
+# Oracle JDK 25 (LTS) のダウンロードとjlink実行
+# JDK 21 は Oracle の無償更新が終わり latest の URL が404になったため、現行LTSの25を使う
+# 取得失敗時にエラーページをtarに渡さないよう -f で HTTP エラーを検知する
+RUN curl -fL -o jdk-25.tar.gz https://download.oracle.com/java/25/latest/jdk-25_linux-x64_bin.tar.gz && \
+    mkdir jdk-25 && tar zxf jdk-25.tar.gz -C ./jdk-25 --strip-components 1 && \
+    mv jdk-25 /usr/local/jdk-25 && \
+    JAVA_HOME=/usr/local/jdk-25 PATH=/usr/local/jdk-25/bin:$PATH \
+      jlink --no-header-files --no-man-pages --compress=zip-6 \
             --add-modules java.base,java.datatransfer,java.desktop \
             --output /opt/jre && \
-    rm -rf jdk-21 jdk-21.tar.gz
+    rm -rf /usr/local/jdk-25 jdk-25.tar.gz
 
 # narou.rb のインストール (公式版 - rubygems.org から最新版を取得)
 # narou.gemspecの `tilt ~> 2.0` 指定に上限が無く、tilt 2.5.0以降は
