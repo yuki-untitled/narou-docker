@@ -41,15 +41,14 @@ RUN LATEST_URL=$(curl -s https://api.github.com/repos/kyukyunyorituryo/AozoraEpu
     unzip aozoraepub3.zip -d /opt/aozoraepub3 && \
     rm aozoraepub3.zip
 
-# narou.rb本体に上書きするファイル群（詳細は各ファイル冒頭のコメント・仕様を参照）
+# narou.rb本体に上書き・書き換えするファイル群（詳細は各ファイル冒頭のコメント・仕様を参照）
 # ここまでのステップと独立かつ最も変更頻度が高いため、最後に配置しキャッシュ効率を上げる
 # 仕様: docs/spec/official-narou-policy.md
 COPY overlay/ overlay/
-COPY patches/ patches/
 
 # サイト構造変更への追従 (PR456, 本家未マージのためビルド時に最新差分を取得して適用) と
 # Linux/Docker環境の403 Forbidden対策 (wgetベース取得方式への置き換え) と
-# https のリバースプロキシ越しの WebSocket 対応 (patches/websocket-https.patch)
+# https のリバースプロキシ越しの WebSocket 対応 (overlay/websocket_https.rb で narou.library.js を書き換え)
 # https://github.com/whiteleaf7/narou/pull/456
 # 取得失敗（HTTPエラー・空応答・エラーページ）を検知するため、パイプせず一旦ファイルに保存して検証する
 # 仕様: docs/spec/official-narou-policy.md
@@ -58,7 +57,7 @@ RUN NAROU_GEM_DIR=$(gem environment gemdir)/gems/narou-* && \
       https://patch-diff.githubusercontent.com/raw/whiteleaf7/narou/pull/456.diff -o pr456.diff && \
     grep -q '^diff --git' pr456.diff && \
     patch -d $NAROU_GEM_DIR -p1 < pr456.diff && \
-    patch -d $NAROU_GEM_DIR -p1 < patches/websocket-https.patch && \
+    ruby overlay/websocket_https.rb $NAROU_GEM_DIR && \
     cp overlay/wget.rb overlay/extension.rb $NAROU_GEM_DIR/lib/
 
 # ========================================

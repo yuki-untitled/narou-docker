@@ -33,8 +33,7 @@ narou-docker/
 ├── dockerfile                        # イメージ定義
 ├── docker-compose.yml                # 起動設定
 ├── init.sh                           # 初期化スクリプト
-├── overlay/                          # narou.rb本体に上書きするファイル（403対策など）
-├── patches/                          # narou.rb本体に当てる差分（https の WebSocket 対応）
+├── overlay/                          # narou.rb本体に上書き・書き換えするファイル（403対策、https の WebSocket 対応）
 ├── docs/spec/official-narou-policy.md # 本ブランチの方針（仕様）
 ├── LICENSE                           # MIT License
 └── README.md                         # このファイル
