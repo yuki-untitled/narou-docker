@@ -18,7 +18,8 @@ TrueNAS Scale での運用を想定し、公式 narou.rb（[whiteleaf7/narou](ht
 - **Oracle OpenJDK Java 21（LTS）** - 最新の安定版 JDK を利用
 - **[改造版 AozoraEpub3](https://github.com/kyukyunyorituryo/AozoraEpub3) 最新版** - GitHub から最新リリースを自動取得
 - **公式 narou.rb** - rubygems.org から `gem install narou` で最新リリースを取得
-  - WebSocket のポートは `server-port + 1` が自動的に使われる仕様のため、追加のパッチは不要（詳細は [docs/spec/official-narou-policy.md](docs/spec/official-narou-policy.md)）
+  - WebSocket のポートは `server-port + 1` が自動的に使われる仕様のため、http で使う分には追加のパッチは不要（詳細は [docs/spec/official-narou-policy.md](docs/spec/official-narou-policy.md)）
+- **https のリバースプロキシ対応** - https で開いたときだけ、WebSocket を同じホストの `/ws` に `wss://` でつなぐ（[リバースプロキシ（https）で使う](#リバースプロキシhttpsで使う)）
 - **サイト構造変更への自動追従** - 本家未マージの [PR #456](https://github.com/whiteleaf7/narou/pull/456)（小説家になろう・ハーメルン・カクヨム・暁等のページ構造修正）をビルド時に最新差分で取得・適用
 - **Linux/Docker 環境の403 Forbidden対策** - Rumia 版の `wget` ベース取得方式（MIT License）を移植し、User-Agent反映・ハーメルン403問題を解消
 - **kindlegen 統合** - Kindle (MOBI) 形式への変換対応
@@ -33,6 +34,7 @@ narou-docker/
 ├── docker-compose.yml                # 起動設定
 ├── init.sh                           # 初期化スクリプト
 ├── overlay/                          # narou.rb本体に上書きするファイル（403対策など）
+├── patches/                          # narou.rb本体に当てる差分（https の WebSocket 対応）
 ├── docs/spec/official-narou-policy.md # 本ブランチの方針（仕様）
 ├── LICENSE                           # MIT License
 └── README.md                         # このファイル
@@ -56,6 +58,29 @@ docker compose down
 ### アクセス
 
 ブラウザで http://localhost:9200 にアクセス
+
+### リバースプロキシ（https）で使う
+
+IP アドレスとポートを覚えずに、`https://narou.example.com` のような名前で開くこともできます。https で開いたときは、ブラウザが WebSocket を同じホストの `/ws` に `wss://` でつなぐので、リバースプロキシで `/ws` をコンテナの 33001 へ、それ以外を 33000 へ中継します（`/ws` は `/` に書き換えて渡す）。http（`http://<IP>:9200`）で開いたときは、これまでどおり 9201 につながります。
+
+Caddy の例（リバースプロキシとコンテナが同じ Docker ネットワークにいる場合）:
+
+```
+narou.example.com {
+	handle /ws {
+		uri strip_prefix /ws
+		reverse_proxy narou:33001
+	}
+	handle {
+		reverse_proxy narou:33000 {
+			flush_interval -1
+		}
+	}
+}
+```
+
+- Web UI には認証が無いので、インターネットには公開せず、家の中や VPN（Tailscale など）の内側だけで使ってください
+- 変更前のイメージの JS がブラウザに残っていると、作品一覧が出ないことがあります。強制再読み込みしてください
 
 ### 定期実行（cron など）
 
